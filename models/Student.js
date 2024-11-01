@@ -21,12 +21,20 @@
 
 const mongoose = require('mongoose');
 
+// const studentSchema = new mongoose.Schema({
+//   name: { type: String, required: true },
+//   email: { type: String, required: true, unique: true },
+//   password: { type: String, required: true },
+//   department: { type: String, required: true },
+//     year: { type: Number, required: true },
+// });
+
 const studentSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  department: String,
-  year: String,
+  name: String,
+  email: { type: String, unique: true },
+  password: String,
+  academicRecord: String,
+  placementsApplied: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Job' }]
 });
 
 module.exports = mongoose.model('Student', studentSchema);

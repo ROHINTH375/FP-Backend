@@ -1,6 +1,8 @@
 const Student = require('../models/Student'); // Assuming you have a Student model
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const Company = require('../models/Company');
+const Application = require('../models/Application');
 require('dotenv').config();
 
 
@@ -143,7 +145,32 @@ const deleteStudent = async (req, res) => {
     }
 };
 
-
+const getDashboardData = async (req, res) => {
+    try {
+      const studentId = req.user.id;
+  
+      // Fetch student data
+      const student = await Student.findById(studentId);
+  
+      // Get the list of applications with company details and status
+      const applications = await Application.find({ studentId }).populate('companyId', 'name');
+      
+      // Get the list of job openings posted by registered companies
+      const jobOpenings = await Company.find().select('jobOpenings name');
+  
+      res.json({
+        student: {
+          name: student.name,
+          email: student.email,
+          image: student.image,
+        },
+        applications,
+        jobOpenings,
+      });
+    } catch (error) {
+      res.status(500).json({ message: 'Error fetching dashboard data', error });
+    }
+  };
  
 module.exports = {
     registerStudent,
@@ -151,5 +178,6 @@ module.exports = {
     getStudentById,
     updateStudent,
     deleteStudent,
-    loginStudent
+    loginStudent,
+    getDashboardData
 };

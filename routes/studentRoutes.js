@@ -3,9 +3,9 @@ const { getStudentProfile, updateStudentProfile } = require('../controllers/stud
 const studentController = require('../controllers/studentController');
 const router = express.Router();
 // const authMiddleware = require('../middleware/authMiddleware');
-const { registerStudent, loginStudent } = require('../controllers/studentController');
+const { registerStudent, loginStudent,getDashboardData } = require('../controllers/studentController');
 const Student = require('../models/Student');
-
+// const auth = require('../middleware/authMiddleware');
 // Student profile routes
 // router.get('/profile', authMiddleware, getStudentProfile);
 // router.put('/profile', authMiddleware, updateStudentProfile);
@@ -13,7 +13,7 @@ const Student = require('../models/Student');
 // router.post('/register', studentController.registerStudent);
 
 // // Register a new student
-router.post('/register-student', studentController.registerStudent);
+// router.post('/register-student', studentController.registerStudent);
 
 // // Get all students
 // router.get('/students', studentController.getAllStudents);
@@ -45,7 +45,8 @@ router.post('/register-student', studentController.registerStudent);
 //         res.status(500).json({ message: 'Student registration failed' });
 //     }
 // });
-// router.post('/register-student', registerStudent);
+router.post('/register-student', registerStudent);
+
 
 // Student Login
 // router.post('/login', async (req, res) => {
@@ -64,5 +65,5 @@ router.post('/register-student', studentController.registerStudent);
 //     }
 // });
 router.post('/login', loginStudent);
-
+router.get('/dashboard',getDashboardData);
 module.exports = router;

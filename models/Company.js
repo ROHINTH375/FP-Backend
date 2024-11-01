@@ -25,6 +25,7 @@ const companySchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    jobListings: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Job' }]
 });
 
 const Company = mongoose.model('Company', companySchema);

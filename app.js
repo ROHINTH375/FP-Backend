@@ -2,20 +2,21 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
-const connectDB = require('./config/db');
+// const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes'); // Import the auth routes
 const studentRoutes = require('./routes/studentRoutes');
 const companyRoutes = require('./routes/companyRoutes');
 const path = require('path');
 const cors = require('cors');
+const adminRoutes = require('./routes/adminRoutes');
 
 // app.use(cors());
 
 // Load environment variables
 dotenv.config();
-
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 // Connect to database
-connectDB();
+// connectDB();
 
 // Connect to your MongoDB
 // mongoose.connect('your-mongodb-connection-string')
@@ -34,11 +35,11 @@ app.use(cors());
 // app.use('/api/applications', require('./routes/applicationRoutes'));
 
 // app.use('/api/auth', require('./routes/authRoutes'));
-app.use('/register-student', studentRoutes);
-app.use('/companies', companyRoutes);
-
 app.use('/api/auth', authRoutes);
+app.use('/api/companies', require('./routes/companyRoutes'));
+app.use('/api/students', require('./routes/studentRoutes'));
 app.use('/api/applications', require('./routes/applicationRoutes'));
+app.use(adminRoutes);
 // app.use('/api/students', require('./routes/studentRoutes'));
 // app.use('/api/companies', require('./routes/companyRoutes'));
 
