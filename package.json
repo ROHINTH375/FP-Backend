@@ -2,6 +2,7 @@
   "name": "college-placement-management",
   "version": "1.0.0",
   "main": "app.js",
+  
   "scripts": {
     "server": " nodemon app.js",
     "client": "cd frontend && npm start",
