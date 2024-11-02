@@ -3,7 +3,7 @@ const { getStudentProfile, updateStudentProfile } = require('../controllers/stud
 const studentController = require('../controllers/studentController');
 const router = express.Router();
 // const authMiddleware = require('../middleware/authMiddleware');
-const { registerStudent, loginStudent,getDashboardData } = require('../controllers/studentController');
+const { registerStudent, loginStudent,getDashboardData, getStudentData } = require('../controllers/studentController');
 const Student = require('../models/Student');
 // const auth = require('../middleware/authMiddleware');
 // Student profile routes
@@ -46,8 +46,8 @@ const Student = require('../models/Student');
 //     }
 // });
 router.post('/register-student', registerStudent);
-
-
+router.get('/dashboard-student', getStudentData);
+router.get('/dashboard', getStudentData);
 // Student Login
 // router.post('/login', async (req, res) => {
 //     try {

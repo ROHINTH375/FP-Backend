@@ -31,6 +31,7 @@
 const Application = require('../models/Application');
 const Company = require('../models/Company');
 const Student = require('../models/Student');
+const Job = require('../models/Job');
 
 // Create a new application for a job
 exports.createApplication = async (req, res) => {
@@ -82,4 +83,81 @@ exports.getCompanyApplications = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: 'Error fetching applications', error });
   }
+};
+
+
+// Apply for a Job
+exports.applyForJob = async (req, res) => {
+  try {
+    const { studentId, jobId, resume } = req.body;
+
+    // Validate input (example: check if job exists)
+    const job = await Job.findById(jobId);
+    if (!job) {
+        return res.status(404).json({ error: 'Job not found' });
+    }
+
+    // Create a new application
+    const application = new Application({
+        studentId,
+        jobId,
+        resume
+    });
+
+    await application.save(); // Save application to the database
+
+    res.status(201).json({ message: 'Application submitted successfully', application });
+} catch (error) {
+    console.error('Error applying for job:', error);
+    res.status(500).json({ error: 'Error applying for job' });
+}
+};
+
+// Get Application Status
+exports.getApplicationStatus = async (req, res) => {
+  const { studentId } = req.params;
+  try {
+    const { applicationId } = req.params; // Get applicationId from request parameters
+    
+    // Find application by ID
+    const application = await Application.findById(applicationId);
+
+    if (!application) {
+        return res.status(404).json({ message: 'Application not found' });
+    }
+
+    res.status(200).json({ status: application.status }); // Return the status of the application
+} catch (error) {
+    console.error('Error fetching application status:', error);
+    res.status(500).json({ error: 'Failed to fetch application status' });
+}
+};
+
+exports.updateApplicationStatus = async (req, res) => {
+  try {
+    const { applicationId } = req.params; // Get applicationId from request parameters
+    const { status } = req.body; // Get new status from request body
+
+    // Validate status (optional, depending on your requirements)
+    const validStatuses = ['application reviewed', 'rejected', 'selected', 'waiting list'];
+    if (!validStatuses.includes(status)) {
+        return res.status(400).json({ message: 'Invalid status' });
+    }
+
+    // Find the application by ID and update its status
+    const updatedApplication = await Application.findByIdAndUpdate(
+        applicationId,
+        { status }, // Update the status
+        { new: true, runValidators: true } // Return the updated document and run validators
+    );
+
+    if (!updatedApplication) {
+        return res.status(404).json({ message: 'Application not found' });
+    }
+
+    res.status(200).json(updatedApplication); // Return the updated application details
+} catch (error) {
+    console.error('Error updating application status:', error);
+    res.status(500).json({ error: 'Failed to update application status' });
+}
 };

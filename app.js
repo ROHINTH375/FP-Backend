@@ -2,47 +2,36 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
-// const connectDB = require('./config/db');
+
 const authRoutes = require('./routes/authRoutes'); // Import the auth routes
 const studentRoutes = require('./routes/studentRoutes');
 const companyRoutes = require('./routes/companyRoutes');
 const path = require('path');
 const cors = require('cors');
 const adminRoutes = require('./routes/adminRoutes');
+const applicationRoutes = require('./routes/applicationRoutes');
+const jobRoutes = require('./routes/jobRoutes');
 
-// app.use(cors());
-
-// Load environment variables
 dotenv.config();
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
-// Connect to database
-// connectDB();
 
-// Connect to your MongoDB
-// mongoose.connect('your-mongodb-connection-string')
-//     .then(() => console.log('MongoDB connected'))
-//     .catch(err => console.error('MongoDB connection error:', err));
 
 const app = express();
 
 // Middleware
 app.use(express.json());
 app.use(cors());
+app.use(bodyParser.json());
 
 
-// Routes
-// app.use('/api/auth', require('./routes/authRoutes'));
-// app.use('/api/applications', require('./routes/applicationRoutes'));
-
-// app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/auth', authRoutes);
-app.use('/api/companies', require('./routes/companyRoutes'));
+app.use('/api/student', studentRoutes);
+app.use('/api/companies', companyRoutes);
 app.use('/api/students', require('./routes/studentRoutes'));
-app.use('/api/applications', require('./routes/applicationRoutes'));
-app.use(adminRoutes);
-// app.use('/api/students', require('./routes/studentRoutes'));
-// app.use('/api/companies', require('./routes/companyRoutes'));
+app.use('/api/applications', applicationRoutes);
+app.use('/api/auth', adminRoutes);
 
+app.use('/api/jobs', jobRoutes);
 
 // Start server
 const PORT = process.env.PORT || 5000;

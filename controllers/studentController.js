@@ -171,6 +171,65 @@ const getDashboardData = async (req, res) => {
       res.status(500).json({ message: 'Error fetching dashboard data', error });
     }
   };
+
+  // controllers/studentController.js
+// const getStudentData = async (req, res) => {
+//     try {
+//         // Sample student data for testing
+//         const studentData = {
+//             name: "John Doe",
+//             email: "johndoe@example.com",
+//             profileImage: "https://via.placeholder.com/150",
+//             progress: 3,
+//             attendance: 85,
+//             tasksSubmitted: 90,
+//             quizzesSubmitted: 75
+//         };
+//         res.status(200).json(studentData);
+//     } catch (error) {
+//         console.error("Error fetching student data:", error);
+//         res.status(500).json({ error: "Failed to fetch student data" });
+//     }
+// };
+
+
+// controllers/studentController.js
+
+const getStudentData = async (req, res) => {
+    try {
+        // Array of sample student data for testing
+        const studentsData = [
+            {
+                id: 1,
+                name: "Alice Smith",
+                email: "alice@example.com",
+                profileImage: "https://via.placeholder.com/150",
+                progress: 2,
+                attendance: 90,
+                tasksSubmitted: 95,
+                quizzesSubmitted: 80
+            },
+            {
+                id: 2,
+                name: "Bob Johnson",
+                email: "bob@example.com",
+                profileImage: "https://via.placeholder.com/150",
+                progress: 4,
+                attendance: 88,
+                tasksSubmitted: 93,
+                quizzesSubmitted: 85
+            },
+            // Add more sample data here
+        ];
+        res.status(200).json(studentsData);
+    } catch (error) {
+        console.error("Error fetching student data:", error);
+        res.status(500).json({ error: "Failed to fetch student data" });
+    }
+};
+
+
+
  
 module.exports = {
     registerStudent,
@@ -179,5 +238,6 @@ module.exports = {
     updateStudent,
     deleteStudent,
     loginStudent,
-    getDashboardData
+    getDashboardData,
+    getStudentData
 };

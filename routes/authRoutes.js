@@ -14,7 +14,7 @@ router.post('/login-company', loginCompany);
 router.post('/register-admin', registerAdmin);
 
 // Login Admin
-router.post('/login-admin', loginAdmin);
+router.post('/admin-login', loginAdmin);
 // router.post('/register-admin', registerAdmin);
 router.get('/test', (req, res) => {
     res.send('API is working');

@@ -5,6 +5,7 @@ const ApplicationSchema = new mongoose.Schema({
   jobTitle: { type: String, required: true },
   resumeLink: String,
   coverLetter: String,
-  status: { type: String, default: 'submitted' }
+  studentId: mongoose.Schema.Types.ObjectId,
+    status: { type: String, enum: ["Applied", "Reviewed", "Rejected", "Selected", "Waiting"], default: "Applied" }
 });
 module.exports = mongoose.model('Application', ApplicationSchema);
