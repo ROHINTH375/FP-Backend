@@ -3,13 +3,8 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "server": " nodemon app.js",
-    "client": "npm start",
-    "dev": "nodemon app.js",
-    "start": "react-scripts start",
-    "build": "npm run build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "node app.js",  
+    "build": "echo 'No build step for backend'"  
   },
   "keywords": [],
   "author": "",
