@@ -31,8 +31,45 @@ const { getAllCompanies } = require('../controllers/companyController');
 
 // Register Company
 router.post('/register-company', registerCompany);
-router.post('/login', loginCompany);
-router.get('/companies', getAllCompanies);
+router.post('/login-company', async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    // Check if the company exists
+    const company = await Company.findOne({ email });
+    if (!company) {
+      return res.status(404).json({ message: 'Company not found' });
+    }
+    // Additional logic for password validation and response goes here
+  } catch (error) {
+    console.error('Error logging in company:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+router.get('/companies', async (req, res) => {
+  try {
+      const companies = await Company.find(); // Fetch all companies from the database
+      res.json(companies);
+  } catch (error) {
+      console.error("Error fetching companies:", error);
+      res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.post('/register', async (req, res) => {
+  try {
+    const { name, description } = req.body;
+    if (!name || !description) {
+      return res.status(400).json({ error: 'Name and description are required.' });
+    }
+
+    const newCompany = new Company({ name, description });
+    await newCompany.save();
+    res.status(201).json({ message: 'Company registered successfully.' });
+  } catch (error) {
+    console.error('Error registering company:', error);
+    res.status(500).json({ error: 'An error occurred while registering the company.' });
+  }
+});
 
 // Login Company
 // router.post('/login', async (req, res) => {

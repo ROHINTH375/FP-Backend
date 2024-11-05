@@ -11,6 +11,7 @@ const cors = require('cors');
 const adminRoutes = require('./routes/adminRoutes');
 const applicationRoutes = require('./routes/applicationRoutes');
 const jobRoutes = require('./routes/jobRoutes');
+const interviewRoutes = require('./routes/interviewRoutes');
 
 dotenv.config();
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -20,7 +21,7 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(cors());
+app.use(cors({ origin: 'http://localhost:3000' }));
 app.use(bodyParser.json());
 
 
@@ -29,8 +30,8 @@ app.use('/api/student', studentRoutes);
 app.use('/api/companies', companyRoutes);
 app.use('/api/students', require('./routes/studentRoutes'));
 app.use('/api/applications', applicationRoutes);
-app.use('/api/auth', adminRoutes);
-
+app.use('/api', adminRoutes);
+app.use('/api/interviews', interviewRoutes);
 app.use('/api/jobs', jobRoutes);
 
 // Start server
