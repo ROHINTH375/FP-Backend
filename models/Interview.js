@@ -19,7 +19,9 @@ const interviewSchema = new mongoose.Schema({
     interviewDate: { type: Date, required: true },
     jobId: { type: mongoose.Schema.Types.ObjectId,  required: true },
     companyId: { type: mongoose.Schema.Types.ObjectId, required: true },
-    studentId: { type: mongoose.Schema.Types.ObjectId,  required: true }
+    studentId: { type: mongoose.Schema.Types.ObjectId,  required: true },
+    format: { type: String, enum: ['In-Person', 'Virtual'], default: 'In-Person' },
+    zoomLink: { type: String } // Optional field for virtual interviews
 });
 
 const Interview = mongoose.model('Interview', interviewSchema);

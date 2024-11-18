@@ -90,32 +90,44 @@ const Admin = require('../models/Admin');
 const JWT_SECRET = process.env.JWT_SECRET || '654a1f8278382c4720453333ba283ed7d1fa43826869d213b27386f9d3288b31';  // Ensure to set this in your environment variables
 
 // Register a new student
-exports.registerStudent = async (req, res) => {
-  console.log("Registering student:", req.body);
-  const { name, email, password } = req.body;
+// exports.registerStudent = async (req, res) => {
+//   console.log("Registering student:", req.body);
+//   const { name, email, password } = req.body;
 
-  try {
-    // Check if the student already exists
-    const existingStudent = await Student.findOne({ email });
-    if (existingStudent) {
-      return res.status(400).json({ message: 'Student already registered with this email' });
-    }
+//   try {
+//     // Check if the student already exists
+//     const existingStudent = await Student.findOne({ email });
+//     if (existingStudent) {
+//       return res.status(400).json({ message: 'Student already registered with this email' });
+//     }
 
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
+//     // Hash the password
+//     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create a new student
-    const newStudent = new Student({
-      name,
-      email,
-      password: hashedPassword,
+//     // Create a new student
+//     const newStudent = new Student({
+//       name,
+//       email,
+//       password: hashedPassword,
       
-    });
+//     });
 
-    await newStudent.save();
-    res.status(201).json({ message: 'Student registered successfully' });
+//     await newStudent.save();
+//     res.status(201).json({ message: 'Student registered successfully' });
+//   } catch (error) {
+//     res.status(500).json({ message: 'Student registration failed', error });
+//   }
+// };
+exports.registerStudent = async (req, res) => {
+  try {
+    const { firstname, lastname, address, department, yearFrom, yearTo, district, pincode, phoneNumber, whatsappNumber, email, password, skills, createdAt } = req.body;
+    // const resumePath = req.file.path; // Resume file path
+    const student = new Student({ firstname, lastname, address, department, yearFrom, yearTo, district, pincode, phoneNumber, whatsappNumber, email, password, skills, createdAt});
+    await student.save();
+    res.status(201).json({ message: 'Student registered successfully!' });
   } catch (error) {
-    res.status(500).json({ message: 'Student registration failed', error });
+    res.status(500).json({ message: 'Error registering student.' });
+    console.log(error);
   }
 };
 

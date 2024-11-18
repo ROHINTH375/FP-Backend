@@ -36,7 +36,7 @@ const Job = require('../models/Job');
 // Create a new application for a job
 exports.createApplication = async (req, res) => {
   try {
-    const { studentId, companyId } = req.body;
+    const { studentId, jobId, coverLetter, resumePath} = req.body;
 
     // Check if student and company exist
     const student = await Student.findById(studentId);
@@ -49,10 +49,13 @@ exports.createApplication = async (req, res) => {
     const application = new Application({
       studentId,
       companyId,
-      status: 'submitted',
+      jobId,
+    coverLetter,
+    resume: resumePath,
+    status: 'submitted',
     });
 
-    await application.save();
+    return await application.save();
     res.status(201).json({ message: 'Application submitted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Error creating application', error });

@@ -1,10 +1,12 @@
 const express = require('express');
-const { getStudentProfile, updateStudentProfile } = require('../controllers/studentController');
+const { getStudentProfile, updateStudentProfile, getStudentDashboard } = require('../controllers/studentController');
 const studentController = require('../controllers/studentController');
 const router = express.Router();
 // const authMiddleware = require('../middleware/authMiddleware');
 const { registerStudent, loginStudent,getDashboardData, getStudentData } = require('../controllers/studentController');
 const Student = require('../models/Student');
+const authMiddleware = require('../middlewares/authMiddleware');
+
 // const auth = require('../middleware/authMiddleware');
 // Student profile routes
 // router.get('/profile', authMiddleware, getStudentProfile);
@@ -48,6 +50,9 @@ const Student = require('../models/Student');
 router.post('/register-student', registerStudent);
 router.get('/dashboard-student', getStudentData);
 router.get('/dashboard', getStudentData);
+router.get('/dashboard-student', authMiddleware);
+router.post('/login-student', loginStudent);
+
 // Student Login
 // router.post('/login', async (req, res) => {
 //     try {
@@ -64,6 +69,9 @@ router.get('/dashboard', getStudentData);
 //         res.status(500).json({ message: 'Login failed' });
 //     }
 // });
-router.post('/login', loginStudent);
+router.get('/api/your-protected-route', authMiddleware, (req, res) => {
+  res.send("This is a protected route!");
+});
+// router.post('/login', loginStudent);
 router.get('/dashboard',getDashboardData);
 module.exports = router;

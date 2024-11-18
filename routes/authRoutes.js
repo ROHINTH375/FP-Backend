@@ -3,10 +3,72 @@ const { registerStudent,registerCompany, loginStudent, loginCompany,  registerAd
 const router = express.Router();
 const Company = require('../models/Company');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const Student = require('../models/Student'); // Adjust the path as needed
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' }); // Save resumes in the `uploads/` folder
+
 // router.post('/register', registerStudent);
 // router.post('/login', login);
+//router.post('/register-student', upload.single('resume'), registerStudent);
 
-router.post('/register-student', registerStudent);
+// router.post('/register-student', async (req, res) => {
+//   const { firstname, lastname, address, department, yearFrom, yearTo, district, pincode, phoneNumber, whatsappNumber, email, password, skills } = req.body;
+
+//   try {
+//     // Check if the student already exists
+//     const existingStudent = await Student.findOne({ email });
+//     if (existingStudent) {
+//       return res.status(400).json({ message: 'Student with this email already exists' });
+//     }
+
+//     // Create a new student record
+//     const newStudent = new Student({
+//       firstname,
+//       lastname,
+//       address,
+//       department,
+//       yearFrom,
+//       yearTo,
+//       district,
+//       pincode,
+//       phoneNumber,
+//       whatsappNumber,
+//       email,
+//       password,
+//       skills,
+//     });
+
+//     // Save the student
+//     await newStudent.save();
+
+//     res.status(201).json({ message: 'Student registered successfully!', student: newStudent });
+//   } catch (error) {
+//     console.error('Error registering student:', error);
+//     res.status(500).json({ message: 'Error registering student', error });
+//   }
+// });
+router.post('/api/refresh-token', (req, res) => {
+  const refreshToken = req.body.refreshToken;
+
+  if (!refreshToken) {
+    return res.status(403).json({ message: 'Refresh token required' });
+  }
+
+  try {
+    // Verify the refresh token
+    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+    const newToken = jwt.sign(
+      { id: decoded.id },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' } // New short-lived access token
+    );
+
+    res.json({ token: newToken });
+  } catch (error) {
+    return res.status(403).json({ message: 'Invalid refresh token' });
+  }
+});
 router.post('/register-company', registerCompany);
 router.post('/login-student', loginStudent);
 router.post('/login-company', async (req, res) => {
@@ -32,12 +94,16 @@ router.post('/login-company', async (req, res) => {
 // Register Admin
 router.post('/register-admin', registerAdmin);
 
+//Register Student
+router.post('/register-student', registerStudent);
+
 // Login Admin
 router.post('/admin-login', loginAdmin);
 // router.post('/register-admin', registerAdmin);
 router.get('/test', (req, res) => {
     res.send('API is working');
   });
+
   
 // router.post('/api/auth/register', registerStudent);
 // router.post('/api/auth/login', login);

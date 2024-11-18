@@ -3,11 +3,71 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Company = require('../models/Company');
 const Application = require('../models/Application');
+
+
 require('dotenv').config();
 
 
 
+const registerStudent = async (req, res) => {
+    try {
+      const {
+        firstname,
+        lastname,
+        address,
+        department,
+        yearFrom,
+        yearTo,
+        district,
+        pincode,
+        phoneNumber,
+        whatsappNumber,
+        email,
+        password,
+        skills,
+      } = req.body;
+  
+      // Validate input
+      if (!firstname || !lastname || !address || !department || !yearFrom || !yearTo || !district || !pincode || !phoneNumber || !email || !password) {
+        return res.status(400).json({ message: 'All fields are required.' });
+    }
+  
+      // Check if student already exists
+      const existingStudent = await Student.findOne({ email });
+      if (existingStudent) {
+        return res.status(400).json({ message: 'Student already registered.' });
+      }
 
+      // Hash password
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+  
+      // Create new student
+      const newStudent = new Student({
+        firstname,
+        lastname,
+        address,
+        department,
+        yearFrom,
+        yearTo,
+        district,
+        pincode,
+        phoneNumber,
+        whatsappNumber,
+        email,
+        password: hashedPassword,
+        skills,
+      });
+  
+      await newStudent.save();
+      res.status(201).json({ message: 'Student registered successfully.' });
+    } catch (error) {
+      console.error('Error in registerStudent:', error.message); // Log error message
+      console.error(error.stack); // Log stack trace for debugging
+      res.status(500).json({ message: 'Internal Server Error', error: error.message });
+    }
+  };
+  
 // Register a new student
 // const registerStudent = async (req, res) => {
 //     try {
@@ -44,17 +104,17 @@ require('dotenv').config();
 //     }
 // };
 
-const registerStudent = async (req, res) => {
-    try {
-        const { name, email, password, department, year } = req.body;
-        const newStudent = new Student({ name, email, password, department, year });
-        await newStudent.save();
-        res.status(201).json(newStudent);
-    } catch (error) {
-        console.error("Error registering student:", error);
-        res.status(500).json({ message: "Error registering student." });
-    }
-};
+// const registerStudent = async (req, res) => {
+//     try {
+//         const { name, email, password, department, year } = req.body;
+//         const newStudent = new Student({ name, email, password, department, year });
+//         await newStudent.save();
+//         res.status(201).json(newStudent);
+//     } catch (error) {
+//         console.error("Error registering student:", error);
+//         res.status(500).json({ message: "Error registering student." });
+//     }
+// };
 
 // exports.registerStudent = async (req, res) => {
 //     try {
@@ -147,30 +207,27 @@ const deleteStudent = async (req, res) => {
 
 const getDashboardData = async (req, res) => {
     try {
-      const studentId = req.user.id;
-  
-      // Fetch student data
-      const student = await Student.findById(studentId);
-  
-      // Get the list of applications with company details and status
-      const applications = await Application.find({ studentId }).populate('companyId', 'name');
-      
-      // Get the list of job openings posted by registered companies
-      const jobOpenings = await Company.find().select('jobOpenings name');
-  
-      res.json({
-        student: {
-          name: student.name,
-          email: student.email,
-          image: student.image,
-        },
-        applications,
-        jobOpenings,
-      });
+        const studentId = req.user.id;
+
+        // Fetch student data
+        const student = await Student.findById(studentId).select('-password');
+
+        // Get applications (Populate company data)
+        const applications = await Application.find({ studentId }).populate('companyId', 'name');
+
+        // Get job openings
+        const jobOpenings = await Company.find().select('jobOpenings name');
+
+        res.json({
+            student,
+            applications,
+            jobOpenings,
+        });
     } catch (error) {
-      res.status(500).json({ message: 'Error fetching dashboard data', error });
+        console.error('Error in getDashboardData:', error.message);
+        res.status(500).json({ message: 'Internal Server Error', error: error.message });
     }
-  };
+};
 
   // controllers/studentController.js
 // const getStudentData = async (req, res) => {
