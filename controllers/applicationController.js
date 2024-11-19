@@ -36,10 +36,11 @@ const Job = require('../models/Job');
 // Create a new application for a job
 exports.createApplication = async (req, res) => {
   try {
-    const { studentId, jobId, coverLetter, resumePath} = req.body;
+    const { jobId, coverLetter, resumePath} = req.body;
+    
 
     // Check if student and company exist
-    const student = await Student.findById(studentId);
+    const studentId = req.user.id;
     const company = await Company.findById(companyId);
     if (!student || !company) {
       return res.status(404).json({ message: 'Student or Company not found' });
@@ -48,16 +49,16 @@ exports.createApplication = async (req, res) => {
     // Create a new application
     const application = new Application({
       studentId,
-      companyId,
       jobId,
     coverLetter,
     resume: resumePath,
     status: 'submitted',
     });
 
-    return await application.save();
+    await application.save();
     res.status(201).json({ message: 'Application submitted successfully' });
   } catch (error) {
+    console.error('Error creating application:', error);
     res.status(500).json({ message: 'Error creating application', error });
   }
 };
@@ -68,9 +69,10 @@ exports.getStudentApplications = async (req, res) => {
     const { studentId } = req.params;
 
     // Retrieve applications for the student
-    const applications = await Application.find({ studentId }).populate('companyId', 'name');
-    res.json(applications);
+    const applications = await Application.find({ studentId }).populate('jobId', 'jobTitle');
+    res.status(200).json(applications);
   } catch (error) {
+    console.error('Error fetching applications:', error);
     res.status(500).json({ message: 'Error fetching applications', error });
   }
 };

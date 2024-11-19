@@ -1,21 +1,10 @@
-// const express = require('express');
-// const { submitApplication, getApplications } = require('../controllers/applicationController');
-// const auth = require('../middlewares/authMiddleware');
-// const router = express.Router();
-
-// router.post('/submit', auth, submitApplication);
-// router.get('/student', auth, getApplications);
-
-// module.exports = router;
-
 const express = require('express');
 const router = express.Router();
 const { createApplication, getStudentApplications, getCompanyApplications ,applyForJob, getApplicationStatus, updateApplicationStatus} = require('../controllers/applicationController');
 const authMiddleware = require('../middlewares/authMiddleware');
 const upload = require('../middlewares/uploadMiddleware');
-// Route to create a new application (protected route)
-// router.post('/create', authMiddleware, createApplication);
-// Route for submitting an application with a resume
+const Application = require('../models/Application');
+
 router.post('/create', authMiddleware, upload.single('resume'), async (req, res) => {
   try {
     const { studentId, jobId, coverLetter } = req.body;
@@ -40,6 +29,33 @@ router.post('/create', authMiddleware, upload.single('resume'), async (req, res)
   }
 });
 
+// Submit application
+router.post('/applications', authMiddleware, createApplication);
+
+// Fetch all applications for a student
+router.get('/applications/:studentId', authMiddleware, getStudentApplications);
+router.get('/applications', authMiddleware, async (req, res) => {
+  try {
+      const { studentId } = req.query;
+
+      if (!studentId) {
+          return res.status(400).json({ message: 'Student ID is required' });
+      }
+
+      const applications = await Application.find({ studentId })
+          .populate('jobId', 'jobTitle')
+          .populate('companyId', 'name');
+      
+      res.status(200).json(applications);
+  } catch (error) {
+      console.error('Error fetching applications:', error);
+      res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+// Fetch specific application status
+router.get('/applications/status/:applicationId', authMiddleware, getApplicationStatus);
+
 // Route to get all applications for a specific student (protected route)
 router.get('/student/:studentId', authMiddleware, getStudentApplications);
 
@@ -60,5 +76,35 @@ router.get('/:studentId', async (req, res) => {
       res.status(500).json({ message: 'Error fetching applications.' });
     }
   });
+  router.get('/:id/academic-records', authMiddleware, async (req, res) => {
+    const { id } = req.params;
+    const records = await AcademicRecord.find({ studentId: id });
+    res.json(records);
+  });
+  
+  router.get('/', authMiddleware, async (req, res) => {
+    const { studentId } = req.query;
+    const applications = await Application.find({ studentId });
+    res.json(applications);
+  });
 
+  router.get('/applications', authMiddleware, async (req, res) => {
+    try {
+        const { studentId } = req.query;
+
+        if (!studentId) {
+            return res.status(400).json({ message: 'Student ID is required' });
+        }
+
+        const applications = await Application.find({ studentId })
+            .populate('jobId', 'jobTitle')
+            .populate('companyId', 'name');
+        
+        res.status(200).json(applications);
+    } catch (error) {
+        console.error('Error fetching applications:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+  
 module.exports = router;

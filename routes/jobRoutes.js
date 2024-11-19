@@ -56,4 +56,6 @@ router.put('/applications/:applicationId', async (req, res) => {
     });
 router.put('/api/jobs/:jobId/status', updateJobStatus);
 
+
+
 module.exports = router;

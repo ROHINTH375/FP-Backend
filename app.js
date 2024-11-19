@@ -18,8 +18,8 @@ const userRoutes = require('./routes/userRoutes');
 const connectDB = require('./config/db');
 const placementRoutes = require('./routes/placementRoutes');
 const academicRoutes = require('./routes/academicRoutes');
-connectDB();
 dotenv.config();
+connectDB();
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 // connectDB();
 
@@ -27,7 +27,7 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(cors({ origin: 'http://localhost:3000' }));
+app.use(cors());
 app.use(bodyParser.json());
 app.use('/api/academic', academicRoutes);
 app.use('/api/user', userRoutes);
@@ -35,7 +35,7 @@ app.use('/api/placement-drives', placementRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api', recruitmentRoutes);
 app.use(studentRoutes);
-app.use('/api/companies', companyRoutes);
+app.use('/api/company', companyRoutes);
 // app.use('/api/students', require('./routes/studentRoutes'));
 app.use('/api/student', studentRoutes);
 app.use('/api/applications', applicationRoutes);

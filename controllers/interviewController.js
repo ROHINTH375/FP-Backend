@@ -124,50 +124,61 @@ const updateInterviewStatus = async (req, res) => {
 //   };
 
   // Get interviews for a student
-  exports.scheduleInterview = async (req, res) => {
-    try {
-      const { studentId, companyId, jobId, interviewDate, interviewFormat, zoomLink } = req.body;
+  // exports.scheduleInterview = async (req, res) => {
+  //   try {
+  //     const { studentId, companyId, jobId, interviewDate, interviewFormat, zoomLink } = req.body;
   
-      // Validate required fields
-      if (!studentId || !companyId || !jobId || !interviewDate) {
-        return res.status(400).json({ message: 'All fields are required.' });
-      }
+  //     // Validate required fields
+  //     if (!studentId || !companyId || !jobId || !interviewDate) {
+  //       return res.status(400).json({ message: 'All fields are required.' });
+  //     }
   
-      const interview = new Interview({
-        studentId,
-        companyId,
-        jobId,
-        interviewDate,
-        interviewFormat,
-        zoomLink,
-      });
+  //     const interview = new Interview({
+  //       studentId,
+  //       companyId,
+  //       jobId,
+  //       interviewDate,
+  //       interviewFormat,
+  //       zoomLink,
+  //     });
   
-      await interview.save();
+  //     await interview.save();
   
-      // Send email notification (example)
-      const student = await Student.findById(studentId);
-      if (student) {
-        await sendEmail(student.email, 'Interview Scheduled', `Your interview is scheduled on ${interviewDate}`);
-      }
+  //     // Send email notification (example)
+  //     const student = await Student.findById(studentId);
+  //     if (student) {
+  //       await sendEmail(student.email, 'Interview Scheduled', `Your interview is scheduled on ${interviewDate}`);
+  //     }
   
-      res.status(201).json({ message: 'Interview scheduled successfully.', interview });
-    } catch (error) {
-      console.error('Error scheduling interview:', error);
-      res.status(500).json({ message: 'Error scheduling interview', error });
-    }
-  };
+  //     res.status(201).json({ message: 'Interview scheduled successfully.', interview });
+  //   } catch (error) {
+  //     console.error('Error scheduling interview:', error);
+  //     res.status(500).json({ message: 'Error scheduling interview', error });
+  //   }
+  // };
   
-  exports.getStudentInterviews = async (req, res) => {
-    try {
-      const studentId = req.params.studentId;
-      const interviews = await Interview.find({ studentId }).populate('companyId jobId');
+  // exports.getStudentInterviews = async (req, res) => {
+  //   try {
+  //     const studentId = req.params.studentId;
+  //     const interviews = await Interview.find({ studentId }).populate('companyId jobId');
   
-      res.status(200).json(interviews);
-    } catch (error) {
-      console.error("Error retrieving interviews:", error);
-      res.status(500).json({ error: 'Error retrieving interviews' });
-    }
-  };
+  //     res.status(200).json(interviews);
+  //   } catch (error) {
+  //     console.error("Error retrieving interviews:", error);
+  //     res.status(500).json({ error: 'Error retrieving interviews' });
+  //   }
+  // };
+  // exports.getStudentInterviews = async (req, res) => {
+  //   try {
+  //     const { studentId } = req.params;
+  
+  //     const interviews = await Interview.find({ studentId }).populate('jobId', 'jobTitle');
+  //     res.status(200).json(interviews);
+  //   } catch (error) {
+  //     console.error('Error fetching student interviews:', error);
+  //     res.status(500).json({ message: 'Error fetching student interviews.' });
+  //   }
+  // };
 
 module.exports = {
     scheduleInterview,

@@ -16,13 +16,12 @@
 const mongoose = require('mongoose');
 
 const interviewSchema = new mongoose.Schema({
+    studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Student', required: true },
+    jobId: { type: mongoose.Schema.Types.ObjectId, ref: 'Job', required: true },
     interviewDate: { type: Date, required: true },
-    jobId: { type: mongoose.Schema.Types.ObjectId,  required: true },
-    companyId: { type: mongoose.Schema.Types.ObjectId, required: true },
-    studentId: { type: mongoose.Schema.Types.ObjectId,  required: true },
-    format: { type: String, enum: ['In-Person', 'Virtual'], default: 'In-Person' },
-    zoomLink: { type: String } // Optional field for virtual interviews
-});
+    format: { type: String, enum: ['virtual', 'in-person'], required: true },
+    zoomLink: { type: String },
+  });
 
 const Interview = mongoose.model('Interview', interviewSchema);
 module.exports = Interview; // Make sure to export the model

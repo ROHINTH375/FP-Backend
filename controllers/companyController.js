@@ -1,133 +1,12 @@
-// const Company = require('../models/Company'); 
-// const bcrypt = require('bcryptjs');
-// const jwt = require('jsonwebtoken');
-// require('dotenv').config();
-
-// // Create a new company
-// const createCompany = async (req, res) => {
-//     try {
-//         const companyData = req.body; // Get the data from the request body
-//         const newCompany = new Company(companyData); // Create a new company instance
-//         await newCompany.save(); // Save the company to the database
-//         res.status(201).json(newCompany); // Respond with the created company
-//     } catch (error) {
-//         res.status(500).json({ message: error.message }); // Handle errors
-//     }
-// };
-
-// // Register a new company
-// const registerCompany = async (req, res) => {
-//     try {
-//         const { name, email, password, jobListings, companyDetails } = req.body;
-        
-//         if (!name || !email || !password || !jobListings || !companyDetails) {
-//             return res.status(400).json({ message: "All fields are required" });
-//         }
-
-//         // Check if company already exists
-//         let company = await Company.findOne({ email });
-//         if (company) {
-//             return res.status(400).json({ message: 'Company already exists' });
-//         }
-
-//         // Create and save new company
-//         company = new Company({
-//             name,
-//             email,
-//             password, // Assume password is hashed in a pre-save middleware in the model
-//             jobListings,
-//             companyDetails
-//         });
-
-//         await company.save();
-
-//         res.status(201).json({ message: 'Company registered successfully', company });
-//     } catch (error) {
-//         console.error('Error in registerCompany:', error);
-//         res.status(500).json({ message: 'Internal server error' });
-//     }
-// };
-
-// // Get all companies
-// const getAllCompanies = async (req, res) => {
-//     try {
-//         const companies = await Company.find();
-//         res.status(200).json(companies);
-//     } catch (error) {
-//         console.error('Error in getAllCompanies:', error);
-//         res.status(500).json({ message: 'Internal server error' });
-//     }
-// };
-
-// // Get company by ID
-// const getCompanyById = async (req, res) => {
-//     try {
-//         const companyId = req.params.id;
-//         const company = await Company.findById(companyId);
-
-//         if (!company) {
-//             return res.status(404).json({ message: 'Company not found' });
-//         }
-
-//         res.status(200).json(company);
-//     } catch (error) {
-//         console.error('Error in getCompanyById:', error);
-//         res.status(500).json({ message: 'Internal server error' });
-//     }
-// };
-
-// // Update company details
-// const updateCompany = async (req, res) => {
-//     try {
-//         const companyId = req.params.id;
-//         const updatedData = req.body;
-
-//         const company = await Company.findByIdAndUpdate(companyId, updatedData, { new: true });
-
-//         if (!company) {
-//             return res.status(404).json({ message: 'Company not found' });
-//         }
-
-//         res.status(200).json({ message: 'Company updated successfully', company });
-//     } catch (error) {
-//         console.error('Error in updateCompany:', error);
-//         res.status(500).json({ message: 'Internal server error' });
-//     }
-// };
-
-// // Delete a company
-// const deleteCompany = async (req, res) => {
-//     try {
-//         const companyId = req.params.id;
-
-//         const company = await Company.findByIdAndDelete(companyId);
-
-//         if (!company) {
-//             return res.status(404).json({ message: 'Company not found' });
-//         }
-
-//         res.status(200).json({ message: 'Company deleted successfully' });
-//     } catch (error) {
-//         console.error('Error in deleteCompany:', error);
-//         res.status(500).json({ message: 'Internal server error' });
-//     }
-// };
-
-// module.exports = {
-//     registerCompany,
-//     getAllCompanies,
-//     getCompanyById,
-//     updateCompany,
-//     deleteCompany,
-//     createCompany,
-// };
-
-
 const Company = require('../models/Company');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const Job = require('../models/Job');
+const Application = require('../models/Application');
+
 require('dotenv').config();
 
+const JWT_SECRET = process.env.JWT_SECRET || 'default_secret_key';
 // Register a new company
 exports.registerCompany = async (req, res) => {
   try {
@@ -158,29 +37,43 @@ exports.registerCompany = async (req, res) => {
 };
 
 // Login a company
+// controllers/companyController.js
 exports.loginCompany = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Check if the company exists
     const company = await Company.findOne({ email });
     if (!company) {
       return res.status(404).json({ message: 'Company not found' });
     }
 
-    // Check if the password is correct
-    const isMatch = await bcrypt.compare(password, company.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+    const isPasswordValid = await bcrypt.compare(password, company.password);
+    if (!isPasswordValid) {
+      return res.status(400).json({ message: 'Invalid email or password' });
     }
 
-    // Generate JWT token
-    const token = jwt.sign({ id: company._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.json({ token, companyId: company._id });
+    const token = jwt.sign(
+      { id: company._id, role: 'company' }, // Include company ID and role in the token payload
+      JWT_SECRET,
+      { expiresIn: '1h' } // Token expires in 1 hour
+    );
+    console.log('Generated Token:', token);
+
+    res.status(200).json({
+      message: 'Login successful',
+      token,
+      company: {
+        id: company._id,
+        name: company.name,
+        email: company.email,
+      },
+    });
   } catch (error) {
-    res.status(500).json({ message: 'Error logging in', error });
+    console.error('Error logging in company:', error.message);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
 
 exports.getAllCompanies = async (req, res) => {
         try {
@@ -191,3 +84,83 @@ exports.getAllCompanies = async (req, res) => {
             res.status(500).json({ message: 'Internal server error' });
         }
     };
+
+    // Post a new job
+    exports.postJob = async (req, res) => {
+      try {
+        const { companyId, jobTitle, jobDescription, requirements } = req.body; // Destructure required fields
+    
+        // Validate the request body
+        if (!jobTitle || !jobDescription || !requirements) {
+          return res.status(400).json({ message: 'jobTitle and jobDescription are required' });
+        }
+    
+        // Create and save the job
+        const job = new Job({
+          companyId: req.user.id,
+          jobTitle,
+          jobDescription,
+          requirements,
+        });
+    
+        await job.save();
+    
+        res.status(201).json({ message: 'Job posted successfully', job });
+      } catch (error) {
+        console.error('Error posting job:', error);
+        res.status(500).json({ message: 'Internal server error', error: error.message });
+      }
+    };
+
+// Fetch jobs posted by the company
+exports.getCompanyJobs = async (req, res) => {
+  try {
+    const companyId = req.user.id;
+    const jobs = await Job.find({ companyId });
+    res.status(200).json(jobs);
+  } catch (error) {
+    console.error('Error fetching jobs:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+// Fetch applications for a specific job
+exports.getJobApplications = async (req, res) => {
+  try {
+    const { jobId } = req.params;
+
+    const applications = await Application.find({ jobId }).populate('studentId', 'firstname lastname email skills');
+    res.status(200).json(applications);
+  } catch (error) {
+    console.error('Error fetching job applications:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+// Update application status
+exports.updateApplicationStatus = async (req, res) => {
+  try {
+    const { applicationId } = req.params;
+    const { status } = req.body;
+
+    const validStatuses = ['Pending', 'Selected', 'Rejected'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ message: 'Invalid status' });
+    }
+
+    const updatedApplication = await Application.findByIdAndUpdate(
+      applicationId,
+      { status },
+      { new: true }
+    );
+
+    if (!updatedApplication) {
+      return res.status(404).json({ message: 'Application not found' });
+    }
+
+    res.status(200).json({ message: 'Application status updated successfully', application: updatedApplication });
+  } catch (error) {
+    console.error('Error updating application status:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};

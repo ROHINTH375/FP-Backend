@@ -13,11 +13,28 @@ const mongoose = require('mongoose');
 // });
 
 const jobSchema = new mongoose.Schema({
-    companyId: { type: mongoose.Schema.Types.ObjectId, ref: 'Company', required: true },
-    jobTitle: { type: String, required: true },
-    jobDescription: { type: String, required: true },
-    requirements: { type: String, required: true },
-    createdAt: { type: Date, default: Date.now },
+    companyId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Company',
+        required: true,
+      },
+      jobTitle: {
+        type: String,
+        required: true,
+      },
+      jobDescription: {
+        type: String,
+        required: true,
+      },
+      requirements: {
+        type: [String], // Array of strings
+        required: true,
+      },
+      createdAt: {
+        type: Date,
+        default: Date.now,
+      },
+      applications: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Application' }], // Reference to Application model
 });
 
 module.exports = mongoose.model('Job', jobSchema);

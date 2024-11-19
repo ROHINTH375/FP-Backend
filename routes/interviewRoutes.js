@@ -49,6 +49,11 @@ router.get('/:studentId', authMiddleware, async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+// Schedule an interview
+router.post('/schedule', authMiddleware, scheduleInterview);
+
+// Get all interviews for a specific student
+router.get('/student/:studentId', authMiddleware, getStudentInterviews);
 
 // router.post('/schedule', async (req, res) => {
 //     console.log('Incoming request body:', req.body);

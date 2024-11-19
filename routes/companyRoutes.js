@@ -1,36 +1,31 @@
 const express = require('express');
-// const { getCompanyProfile, postJob } = require('../controllers/companyController');
 const router = express.Router();
 const companyController = require('../controllers/companyController');  // Import the companyController
 const authMiddleware = require('../middlewares/authMiddleware');
 const { registerCompany, loginCompany } = require('../controllers/companyController');
 const jwt = require('jsonwebtoken');
 const Company = require('../models/Company');
+const Job = require('../models/Job');
+const Application = require('../models/Application');
+
 const bcrypt = require('bcryptjs');
-const { getAllCompanies } = require('../controllers/companyController');
-
-// Company profile routes
-// router.get('/profile', authMiddleware, getCompanyProfile);
-// router.post('/job', authMiddleware, postJob);
-// router.post('/companies', companyController.createCompany);
-
-// // Company Registration Endpoint
-// router.post('/register', companyController.registerCompany);
-
-// // Get all companies
-// router.get('/api/companies', companyController.getAllCompanies);
-
-// // Get a single company by ID
-// router.get('/companies/:id', companyController.getCompanyById);
-
-// // Update company details by ID
-// router.put('/companies/:id', companyController.updateCompany);
-
-// // Delete a company by ID
-// router.delete('/companies/:id', companyController.deleteCompany);
+const { postJob, getCompanyJobs, getJobApplications, updateApplicationStatus } = require('../controllers/companyController');
 
 // Register Company
 router.post('/register-company', registerCompany);
+// router.get('/dashboard', authMiddleware, async (req, res) => {
+//   try {
+//     const companyId = req.user.id; // Assuming the token contains the company ID
+
+//     // Fetch job postings
+//     const jobs = await Job.find({ companyId }).populate('applications');
+
+//     res.status(200).json({ jobs });
+//   } catch (error) {
+//     console.error('Error fetching company dashboard:', error);
+//     res.status(500).json({ message: 'Failed to fetch dashboard data.' });
+//   }
+// });
 router.post('/login-company', async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -45,6 +40,7 @@ router.post('/login-company', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
+
 router.get('/companies', async (req, res) => {
   try {
       const companies = await Company.find(); // Fetch all companies from the database
@@ -70,8 +66,17 @@ router.post('/register', async (req, res) => {
     res.status(500).json({ error: 'An error occurred while registering the company.' });
   }
 });
+// Post a new job
+router.post('/post-job', authMiddleware, postJob);
 
-// Login Company
+// Fetch jobs posted by the company
+router.get('/jobs', authMiddleware, getCompanyJobs);
+
+// Fetch applications for a specific job
+router.get('/job-applications/:jobId', authMiddleware, getJobApplications);
+
+// Update application status
+router.put('/update-application-status/:applicationId', authMiddleware, updateApplicationStatus);
 // router.post('/login', async (req, res) => {
 //     const { email, password } = req.body;
 //     try {
@@ -141,5 +146,30 @@ router.get('/protected-route', authMiddleware, (req, res) => {
     res.json({ message: 'Welcome to the protected route!', user: req.user });
   });
 
+  router.get('/dashboard-company', authMiddleware, async (req, res) => {
+    try {
+      const companyId = req.user.id; // Ensure this comes from the decoded token
+      const company = await Company.findById(companyId).populate('jobPostings');
+  
+      if (!company) {
+        return res.status(404).json({ message: 'Company not found' });
+      }
+  
+      // Fetch jobs and applications
+    const jobs = await Job.find({ companyId }).populate('applications');
+
+    return res.status(200).json({
+      company: {
+        id: company._id,
+        name: company.name,
+        email: company.email,
+      },
+      jobs,
+    });
+  } catch (error) {
+    console.error('Error fetching dashboard data:', error.message);
+    return res.status(500).json({ message: 'Server error', error });
+  }
+});
   
 module.exports = router;

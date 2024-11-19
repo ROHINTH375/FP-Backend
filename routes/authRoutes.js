@@ -8,46 +8,6 @@ const Student = require('../models/Student'); // Adjust the path as needed
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' }); // Save resumes in the `uploads/` folder
 
-// router.post('/register', registerStudent);
-// router.post('/login', login);
-//router.post('/register-student', upload.single('resume'), registerStudent);
-
-// router.post('/register-student', async (req, res) => {
-//   const { firstname, lastname, address, department, yearFrom, yearTo, district, pincode, phoneNumber, whatsappNumber, email, password, skills } = req.body;
-
-//   try {
-//     // Check if the student already exists
-//     const existingStudent = await Student.findOne({ email });
-//     if (existingStudent) {
-//       return res.status(400).json({ message: 'Student with this email already exists' });
-//     }
-
-//     // Create a new student record
-//     const newStudent = new Student({
-//       firstname,
-//       lastname,
-//       address,
-//       department,
-//       yearFrom,
-//       yearTo,
-//       district,
-//       pincode,
-//       phoneNumber,
-//       whatsappNumber,
-//       email,
-//       password,
-//       skills,
-//     });
-
-//     // Save the student
-//     await newStudent.save();
-
-//     res.status(201).json({ message: 'Student registered successfully!', student: newStudent });
-//   } catch (error) {
-//     console.error('Error registering student:', error);
-//     res.status(500).json({ message: 'Error registering student', error });
-//   }
-// });
 router.post('/api/refresh-token', (req, res) => {
   const refreshToken = req.body.refreshToken;
 
@@ -71,42 +31,39 @@ router.post('/api/refresh-token', (req, res) => {
 });
 router.post('/register-company', registerCompany);
 router.post('/login-student', loginStudent);
-router.post('/login-company', async (req, res) => {
-  const { email, password } = req.body;
+// router.post('/login-company', async (req, res) => {
+//   const { email, password } = req.body;
   
-  if (!email || !password) {
-      return res.status(400).json({ message: 'Email and password are required' });
-  }
+//   if (!email || !password) {
+//       return res.status(400).json({ message: 'Email and password are required' });
+//   }
 
-  // Add logic to verify the company credentials here
-  // For example:
-  const company = await Company.findOne({ email });
-  if (!company || !(await bcrypt.compare(password, company.password))) {
-      return res.status(400).json({ message: 'Invalid email or password' });
-  }
+//   // Add logic to verify the company credentials here
+//   // For example:
+//   const company = await Company.findOne({ email });
+//   if (!company || !(await bcrypt.compare(password, company.password))) {
+//       return res.status(400).json({ message: 'Invalid email or password' });
+//   }
 
-  // Generate and return a token or success response
-  res.status(200).json({ message: 'Login successful', token: 'your-jwt-token' });
-  res.json({ message: 'Login successful', companyId: company._id });
+//   // Generate and return a token or success response
+//   res.status(200).json({ message: 'Login successful', token: 'your-jwt-token' });
+//   res.json({ message: 'Login successful', companyId: company._id });
 
-});
+// });
 
 // Register Admin
 router.post('/register-admin', registerAdmin);
-
+router.post('/login-company', loginCompany);
 //Register Student
 router.post('/register-student', registerStudent);
 
 // Login Admin
 router.post('/admin-login', loginAdmin);
-// router.post('/register-admin', registerAdmin);
+
 router.get('/test', (req, res) => {
     res.send('API is working');
   });
 
-  
-// router.post('/api/auth/register', registerStudent);
-// router.post('/api/auth/login', login);
 
 
 module.exports = router;
