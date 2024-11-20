@@ -18,6 +18,7 @@ const userRoutes = require('./routes/userRoutes');
 const connectDB = require('./config/db');
 const placementRoutes = require('./routes/placementRoutes');
 const Application = require('./models/Application');
+const analyticsRoutes = require('./routes/analyticsRoutes');
 
 const academicRoutes = require('./routes/academicRoutes');
 dotenv.config();
@@ -32,6 +33,7 @@ app.use(express.json());
 app.use(cors());
 app.use(bodyParser.json());
 app.use('/api/academic', academicRoutes);
+app.use('/api/analytics', analyticsRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api', placementRoutes);
 app.use('/api/auth', authRoutes);

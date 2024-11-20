@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const AcademicRecord = require('../models/AcademicRecord');
-
+const { createOrUpdateAcademicRecord, getAcademicRecord } = require('../controllers/academicController');
 // Middleware for authentication
 const authMiddleware = require('../middlewares/authMiddleware');
 
@@ -37,5 +37,8 @@ router.get('/:studentId', authMiddleware, async (req, res) => {
     res.status(500).json({ message: 'Error fetching academic record', error });
   }
 });
+
+router.post('/', authMiddleware, createOrUpdateAcademicRecord); // Create/Update
+router.get('/:studentId', authMiddleware, getAcademicRecord); // Fetch by studentId
 
 module.exports = router;
