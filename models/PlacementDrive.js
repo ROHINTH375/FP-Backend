@@ -2,13 +2,9 @@
 const mongoose = require('mongoose');
 
 const placementDriveSchema = new mongoose.Schema({
-  name: { type: String, required: true },
+  title: { type: String, required: true },
   date: { type: Date, required: true },
-  location: { type: String, required: true },
-  companies: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Company' }],
-  students: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Student' }],
-  description: { type: String },
-  status: { type: String, enum: ['Scheduled', 'Completed', 'Cancelled'], default: 'Scheduled' },
+  companiesParticipating: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Company' }],
 });
 
 module.exports = mongoose.model('PlacementDrive', placementDriveSchema);

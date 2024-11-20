@@ -36,30 +36,29 @@ const Job = require('../models/Job');
 // Create a new application for a job
 exports.createApplication = async (req, res) => {
   try {
-    const { jobId, coverLetter, resumePath} = req.body;
-    
+      const application = new Application({
+          studentId: req.body.studentId,
+          jobId: req.body.jobId,
+          status: req.body.status,
+          description: req.body.description,
+          title: req.body.title,
+          companyId: req.body.companyId,
+          appliedDate: req.body.appliedDate
+      });
+      await application.save();
+      res.status(201).json({ message: "Application created successfully", application });
+  } catch (err) {
+      res.status(400).json({ error: "Error creating application", details: err });
+  }
+};
 
-    // Check if student and company exist
-    const studentId = req.user.id;
-    const company = await Company.findById(companyId);
-    if (!student || !company) {
-      return res.status(404).json({ message: 'Student or Company not found' });
-    }
 
-    // Create a new application
-    const application = new Application({
-      studentId,
-      jobId,
-    coverLetter,
-    resume: resumePath,
-    status: 'submitted',
-    });
-
-    await application.save();
-    res.status(201).json({ message: 'Application submitted successfully' });
-  } catch (error) {
-    console.error('Error creating application:', error);
-    res.status(500).json({ message: 'Error creating application', error });
+exports.getApplicationsByJobId = async (req, res) => {
+  try {
+      const applications = await Application.find({ jobId: req.params.jobId }).populate('studentId jobId companyId');
+      res.status(200).json(applications);
+  } catch (err) {
+      res.status(400).json({ error: "Error fetching applications", details: err });
   }
 };
 
@@ -90,6 +89,15 @@ exports.getCompanyApplications = async (req, res) => {
   }
 };
 
+exports.getApplications = async (req, res) => {
+  try {
+    const applications = await Application.find(); // Fetch all applications
+    res.status(200).json(applications);
+  } catch (error) {
+    console.error('Error fetching applications:', error.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
 
 // Apply for a Job
 exports.applyForJob = async (req, res) => {

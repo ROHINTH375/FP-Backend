@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { createApplication, getStudentApplications, getCompanyApplications ,applyForJob, getApplicationStatus, updateApplicationStatus} = require('../controllers/applicationController');
 const authMiddleware = require('../middlewares/authMiddleware');
+const applicationController = require('../controllers/applicationController');
 const upload = require('../middlewares/uploadMiddleware');
 const Application = require('../models/Application');
 
@@ -28,10 +29,15 @@ router.post('/create', authMiddleware, upload.single('resume'), async (req, res)
     res.status(500).json({ message: 'Error submitting application', error: error.message });
   }
 });
+router.get('/applications', applicationController.getApplications);
 
 // Submit application
 router.post('/applications', authMiddleware, createApplication);
+router.get('/applications', applicationController.getApplications);
+router.post('/', applicationController.createApplication);
 
+// GET: Get applications by Job ID
+router.get('/job/:jobId', applicationController.getApplicationsByJobId);
 // Fetch all applications for a student
 router.get('/applications/:studentId', authMiddleware, getStudentApplications);
 router.get('/applications', authMiddleware, async (req, res) => {
@@ -87,6 +93,8 @@ router.get('/:studentId', async (req, res) => {
     const applications = await Application.find({ studentId });
     res.json(applications);
   });
+
+  
 
   router.get('/applications', authMiddleware, async (req, res) => {
     try {

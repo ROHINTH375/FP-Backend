@@ -20,23 +20,42 @@ const PlacementDrive = require('../models/PlacementDrive'); // Assuming you have
 //         res.status(500).json({ message: 'Internal server error' });
 //     }
 // };
+// exports.createPlacementDrive = async (req, res) => {
+//     try {
+//       const { title, description, date, location, companiesParticipating } = req.body;
+//       const placementDrive = new PlacementDrive({
+//         title,
+//         description,
+//         date,
+//         location,
+//         companiesParticipating,
+//       });
+//       await placementDrive.save();
+//       res.status(201).json({ message: 'Placement Drive created successfully', placementDrive });
+//     } catch (error) {
+//       console.error('Error creating placement drive:', error);
+//       res.status(500).json({ error: 'Internal server error' });
+//     }
+//   };
 exports.createPlacementDrive = async (req, res) => {
-    try {
-      const { title, description, date, location, companiesParticipating } = req.body;
-      const placementDrive = new PlacementDrive({
-        title,
-        description,
-        date,
-        location,
-        companiesParticipating,
-      });
-      await placementDrive.save();
-      res.status(201).json({ message: 'Placement Drive created successfully', placementDrive });
-    } catch (error) {
-      console.error('Error creating placement drive:', error);
-      res.status(500).json({ error: 'Internal server error' });
+  try {
+    const { title, date, companiesParticipating } = req.body;
+
+    // Validate required fields
+    if (!title || !date || !companiesParticipating) {
+      return res.status(400).json({ error: 'All fields are required.' });
     }
-  };
+
+    // Create a new placement drive
+    const newPlacementDrive = new PlacementDrive({ title, date, companiesParticipating });
+    await newPlacementDrive.save();
+
+    res.status(201).json({ message: 'Placement drive created successfully.', placementDrive: newPlacementDrive });
+  } catch (error) {
+    console.error('Error creating placement drive:', error.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
 
 // Get all placement drives
 exports.getAllPlacementDrives = async (req, res) => {

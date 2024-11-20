@@ -57,6 +57,8 @@ router.post('/login-company', loginCompany);
 //Register Student
 router.post('/register-student', registerStudent);
 
+
+
 // Login Admin
 router.post('/admin-login', loginAdmin);
 

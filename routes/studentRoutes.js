@@ -52,7 +52,7 @@ router.get('/dashboard-student', getStudentData);
 router.get('/dashboard', getStudentData);
 router.get('/dashboard-student', authMiddleware);
 router.post('/login-student', loginStudent);
-
+// router.post('/students', studentController.createStudent);
 // Student Login
 // router.post('/login', async (req, res) => {
 //     try {

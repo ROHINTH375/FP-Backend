@@ -17,6 +17,8 @@ const Student = require('./models/Student');
 const userRoutes = require('./routes/userRoutes');
 const connectDB = require('./config/db');
 const placementRoutes = require('./routes/placementRoutes');
+const Application = require('./models/Application');
+
 const academicRoutes = require('./routes/academicRoutes');
 dotenv.config();
 connectDB();
@@ -31,13 +33,13 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use('/api/academic', academicRoutes);
 app.use('/api/user', userRoutes);
-app.use('/api/placement-drives', placementRoutes);
+app.use('/api', placementRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api', recruitmentRoutes);
 app.use(studentRoutes);
 app.use('/api/company', companyRoutes);
 // app.use('/api/students', require('./routes/studentRoutes'));
-app.use('/api/student', studentRoutes);
+app.use('/api', studentRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api', adminRoutes);
 app.use('/api/interviews', interviewRoutes);
@@ -56,6 +58,68 @@ app.post('/api/auth/register-student', async (req, res) => {
     });
   }
 });
+
+app.post('/api/applications', async (req, res) => {
+  try {
+      const { studentId, jobId, status } = req.body;
+
+      // Validate the required fields
+      if (!studentId || !jobId) {
+          return res.status(400).json({ error: 'Student ID and Job ID are required' });
+      }
+
+      // Create a new application
+      const newApplication = new Application({
+          studentId,
+          jobId,
+          status: status || 'pending' // Default status is 'pending'
+      });
+
+      // Save the application to the database
+      await newApplication.save();
+
+      // Respond with the created application
+      res.status(201).json(newApplication);
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Server error' });
+  }
+});
+
+app.post('/api/applications', async (req, res) => {
+  try {
+      const { studentId, jobId, status } = req.body;
+
+      // Validate the required fields
+      if (!studentId || !jobId) {
+          return res.status(400).json({ error: 'Student ID and Job ID are required' });
+      }
+
+      // Create a new application
+      const newApplication = new Application({
+          studentId,
+          jobId,
+          status: status || 'pending' // Default status is 'pending'
+      });
+
+      // Save the application to the database
+      await newApplication.save();
+
+      // Respond with the created application
+      res.status(201).json(newApplication);
+  } catch (error) {
+      console.error('Error occurred while creating application:', error);
+
+      // Check if it's a validation error or other type of error
+      if (error.name === 'ValidationError') {
+          return res.status(400).json({ error: error.message });
+      }
+
+      // For other types of errors, return a generic server error
+      res.status(500).json({ error: 'Server error', details: error.message });
+  }
+});
+
 app.get('/', (req, res) => {
   res.send('Hello World');
 });

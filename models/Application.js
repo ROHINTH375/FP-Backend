@@ -7,12 +7,17 @@ const ApplicationSchema = new mongoose.Schema({
   // coverLetter: String,
   // studentId: mongoose.Schema.Types.ObjectId,
   //   status: { type: String, enum: ["Applied", "Reviewed", "Rejected", "Selected", "Waiting"], default: "Applied" }
-  companyId: { type: mongoose.Schema.Types.ObjectId, ref: 'Company', required: true },
-  title: { type: String, required: true },
+  studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Student', required: true },
+  jobId: { type: mongoose.Schema.Types.ObjectId, ref: 'Job', required: true },
+  status: { 
+      type: String, 
+      enum: ['pending', 'reviewed', 'rejected', 'selected', 'open'],  // Adding 'open' to the allowed values
+      default: 'pending' 
+  },
   description: { type: String, required: true },
-  applications: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Application' }],
-  status: { type: String, enum: ['open', 'closed'], default: 'open' },
-  createdAt: { type: Date, default: Date.now },
+  title: { type: String, required: true },
+  companyId: { type: mongoose.Schema.Types.ObjectId, ref: 'Company', required: true },
+  appliedDate: { type: Date, default: Date.now }
 });
 const Application = mongoose.model('Application',ApplicationSchema );
 

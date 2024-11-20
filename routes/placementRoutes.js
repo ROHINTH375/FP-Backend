@@ -7,8 +7,10 @@ const {
     updatePlacementDrive,
     deletePlacementDrive,
   } = require('../controllers/placementDriveController');
+  const placementDriveController = require('../controllers/placementDriveController');
 
-  router.post('/placement-drives', createPlacementDrive); // Create a placement drive
+  router.post('/placement-drives', placementDriveController.createPlacementDrive);
+  // router.post('/placement-drives', createPlacementDrive); // Create a placement drive
 router.get('/placement-drives', getAllPlacementDrives); // Get all placement drives
 router.put('/placement-drives/:id', updatePlacementDrive); // Update a placement drive
 router.delete('/placement-drives/:id', deletePlacementDrive); // Delete a placement drive
