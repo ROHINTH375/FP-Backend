@@ -76,14 +76,14 @@ exports.loginCompany = async (req, res) => {
 
 
 exports.getAllCompanies = async (req, res) => {
-        try {
-            const companies = await Company.find();
-            res.status(200).json(companies);
-        } catch (error) {
-            console.error('Error in getAllCompanies:', error);
-            res.status(500).json({ message: 'Internal server error' });
-        }
-    };
+  try {
+    const companies = await Company.find().select('-password'); // Exclude password field
+    res.status(200).json(companies);
+  } catch (error) {
+    console.error('Error fetching companies:', error);
+    res.status(500).json({ error: 'Error fetching companies' });
+  }
+};
 
     // Post a new job
     exports.postJob = async (req, res) => {

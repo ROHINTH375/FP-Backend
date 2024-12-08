@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 // const companyController = require('../controllers/companyController');  // Import the companyController
 const authMiddleware = require('../middlewares/authMiddleware');
-const { registerCompany, loginCompany } = require('../controllers/companyController');
+const { registerCompany, loginCompany,getAllCompanies } = require('../controllers/companyController');
 const jwt = require('jsonwebtoken');
 const Company = require('../models/Company');
 const Job = require('../models/Job');
@@ -29,16 +29,17 @@ router.post('/login-company', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
-
-router.get('/companies', async (req, res) => {
-  try {
-      const companies = await Company.find(); // Fetch all companies from the database
-      res.json(companies);
-  } catch (error) {
-      console.error("Error fetching companies:", error);
-      res.status(500).json({ message: "Server error" });
-  }
-});
+router.get('/companies', getAllCompanies);
+router.get('/', getAllCompanies);
+// router.get('/companies', async (req, res) => {
+//   try {
+//       const companies = await Company.find(); // Fetch all companies from the database
+//       res.json(companies);
+//   } catch (error) {
+//       console.error("Error fetching companies:", error);
+//       res.status(500).json({ message: "Server error" });
+//   }
+// });
 
 router.post('/register', async (req, res) => {
   try {

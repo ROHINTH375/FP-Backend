@@ -48,7 +48,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api', recruitmentRoutes);
 app.use('/api', studentRoutes);
 app.use('/api/company', companyRoutes);
-app.use('/company', companyRoutes);
+app.use('/api', companyRoutes);
 // app.use('/api/students', require('./routes/studentRoutes'));
 app.use('/api', studentRoutes);
 app.use('/api/applications', applicationRoutes);

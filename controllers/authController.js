@@ -4,7 +4,8 @@ const bcrypt = require('bcrypt');
 const Student = require('../models/Student');
 const Company = require('../models/Company');
 const Admin = require('../models/Admin');
-
+const PlacementDrive = require('../models/PlacementDrive'); // Import the model
+const { createPlacementDrive } = require('../controllers/placementDriveController');
 
 const JWT_SECRET = process.env.JWT_SECRET || '654a1f8278382c4720453333ba283ed7d1fa43826869d213b27386f9d3288b31';  // Ensure to set this in your environment variables
 const generateToken = (id, role) => {
@@ -147,3 +148,25 @@ exports.loginCompany = async (req, res) => {
   }
 };
 
+exports.createPlacementDrive = async (req, res) => {
+  try {
+    console.log('Received data:', req.body); // Log incoming data
+
+    const { title, date, companiesParticipating } = req.body;
+
+    if (!title || !date || !companiesParticipating) {
+      return res.status(400).json({ message: 'All fields are required.' });
+    }
+
+    // Create a new PlacementDrive document
+    const newDrive = new PlacementDrive({ title, date, companiesParticipating });
+    await newDrive.save();
+
+    console.log('New placement drive created:', newDrive); // Log the saved object
+
+    res.status(201).json({ message: 'Placement drive created successfully', newDrive });
+  } catch (error) {
+    console.error('Error in createPlacementDrive:', error); // Log the error
+    res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+};

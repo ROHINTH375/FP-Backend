@@ -38,25 +38,27 @@ const PlacementDrive = require('../models/PlacementDrive'); // Assuming you have
 //     }
 //   };
 exports.createPlacementDrive = async (req, res) => {
-  try {
-    const { title, date, companiesParticipating } = req.body;
+  console.log(req.body);
+  const { company, jobTitle, date } = req.body;
 
+  try {
     // Validate required fields
-    if (!title || !date || !companiesParticipating) {
-      return res.status(400).json({ error: 'All fields are required.' });
+    if (!company || !jobTitle || !date) {
+      return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    // Create a new placement drive
-    const newPlacementDrive = new PlacementDrive({ title, date, companiesParticipating });
-    await newPlacementDrive.save();
+    // Create a new PlacementDrive entry
+    const newDrive = new PlacementDrive({ company, jobTitle, date });
 
-    res.status(201).json({ message: 'Placement drive created successfully.', placementDrive: newPlacementDrive });
+    // Save the new placement drive
+    await newDrive.save();
+
+    res.status(201).json({ message: 'Placement drive created successfully', newDrive });
   } catch (error) {
-    console.error('Error creating placement drive:', error.message);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Error creating placement drive:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
-
 // Get all placement drives
 exports.getAllPlacementDrives = async (req, res) => {
     try {
