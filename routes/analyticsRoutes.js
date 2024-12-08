@@ -29,4 +29,20 @@ router.get('/reports', async (req, res) => {
   }
 });
 
+router.get('/analytics/recruitment-stats', async (req, res) => {
+  try {
+    const totalApplications = await Application.countDocuments();
+    const selected = await Application.countDocuments({ status: 'selected' });
+    const rejected = await Application.countDocuments({ status: 'rejected' });
+
+    res.json({
+      totalApplications,
+      selected,
+      rejected,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch recruitment stats.' });
+  }
+});
+
 module.exports = router;

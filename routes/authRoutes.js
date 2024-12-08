@@ -30,6 +30,36 @@ router.post('/api/refresh-token', (req, res) => {
   }
 });
 router.post('/register-company', registerCompany);
+router.post("/register-company", async (req, res) => {
+  try {
+    const { name, email, password, contactNumber, address } = req.body;
+
+    // Check if the company already exists
+    const existingCompany = await Company.findOne({ email });
+    if (existingCompany) {
+      return res.status(400).json({ message: "Company already registered." });
+    }
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create a new company
+    const newCompany = new Company({
+      name,
+      email,
+      password: hashedPassword,
+      contactNumber,
+      address,
+    });
+
+    await newCompany.save();
+
+    res.status(201).json({ message: "Company registered successfully." });
+  } catch (error) {
+    console.error("Error registering company:", error.message);
+    res.status(500).json({ message: "Internal server error." });
+  }
+});
 router.post('/login-student', loginStudent);
 // router.post('/login-company', async (req, res) => {
 //   const { email, password } = req.body;
@@ -54,6 +84,7 @@ router.post('/login-student', loginStudent);
 // Register Admin
 router.post('/register-admin', registerAdmin);
 router.post('/login-company', loginCompany);
+console.log('Login request received');
 //Register Student
 router.post('/register-student', registerStudent);
 

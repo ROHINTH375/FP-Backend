@@ -6,31 +6,6 @@ const Interview = require('../models/Interview');
 const mongoose = require('mongoose');
 const authMiddleware = require('../middlewares/authMiddleware');
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
-// router.post('/schedule', async (req, res) => {
-//     console.log('Incoming request body:', req.body); // Log the incoming data
-    
-//     try {
-//         const { interviewDate, jobId, companyId, studentId } = req.body;
-
-//         // Check for required fields
-//         if (!interviewDate || !jobId || !companyId || !studentId) {
-//             return res.status(400).json({ message: 'interviewDate, jobId, companyId, and studentId are required.' });
-//         }
-
-//         const newInterview = new Interview({
-//             interviewDate,
-//             jobId,
-//             companyId,
-//             studentId // Add studentId to the new Interview document
-//         });
-
-//         await newInterview.save();
-//         res.status(201).json({ message: 'Interview scheduled successfully' });
-//     } catch (error) {
-//         console.error('Error scheduling interview:', error);
-//         res.status(500).json({ message: 'Internal Server Error', error: error.message });
-//     }
-// });
 router.get('/:studentId', authMiddleware, async (req, res) => {
   try {
     const { studentId } = req.params;
@@ -54,9 +29,6 @@ router.post('/schedule', authMiddleware, scheduleInterview);
 
 // Get all interviews for a specific student
 router.get('/student/:studentId', authMiddleware, getStudentInterviews);
-
-// router.post('/schedule', async (req, res) => {
-//     console.log('Incoming request body:', req.body);
 
 //     const { studentId, companyId, jobId, interviewDate, interviewFormat, zoomLink } = req.body;
 

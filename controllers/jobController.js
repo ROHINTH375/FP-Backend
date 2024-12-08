@@ -74,10 +74,10 @@ exports.updateJobStatus = async (req, res) => {
 
 exports.postJob = async (req, res) => {
     try {
-      const { companyId, jobTitle, jobDescription, requirements } = req.body;
+      const {  jobTitle, jobDescription, requirements } = req.body;
   
       // Validate input
-       if (!jobTitle || !jobDescription) {
+       if (!jobTitle || !jobDescription || !requirements) {
       return res.status(400).json({ message: 'jobTitle and jobDescription are required' });
     }
   
@@ -89,11 +89,13 @@ exports.postJob = async (req, res) => {
   
       // Create a new job
       const newJob = new Job({
-        companyId,
+        
         jobTitle,
         jobDescription,
         requirements,
+        companyId: req.user.id,
       });
+      console.log('Job saved to database:', job);
       console.log('Incoming Request Body:', req.body);
   
       await newJob.save();

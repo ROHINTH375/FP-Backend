@@ -227,30 +227,7 @@ const getDashboardData = async (req, res) => {
         console.error('Error in getDashboardData:', error.message);
         res.status(500).json({ message: 'Internal Server Error', error: error.message });
     }
-};
-
-  // controllers/studentController.js
-// const getStudentData = async (req, res) => {
-//     try {
-//         // Sample student data for testing
-//         const studentData = {
-//             name: "John Doe",
-//             email: "johndoe@example.com",
-//             profileImage: "https://via.placeholder.com/150",
-//             progress: 3,
-//             attendance: 85,
-//             tasksSubmitted: 90,
-//             quizzesSubmitted: 75
-//         };
-//         res.status(200).json(studentData);
-//     } catch (error) {
-//         console.error("Error fetching student data:", error);
-//         res.status(500).json({ error: "Failed to fetch student data" });
-//     }
-// };
-
-
-// controllers/studentController.js
+}
 
 const getStudentData = async (req, res) => {
     try {
@@ -285,6 +262,31 @@ const getStudentData = async (req, res) => {
     }
 };
 
+const getStudentDashboard = async (req, res) => {
+    try {
+      const userId = req.user.id; // Extract user ID from middleware
+      console.log("User ID from middleware:", userId); // Log the user ID to ensure it's coming through correctly
+  
+      // Fetch student data from the database
+      const studentData = await Student.findById(userId).select('-password');
+      if (!studentData) {
+        return res.status(404).json({ message: 'Student not found' });
+      }
+  
+      // Get applications associated with the student
+      const applications = await Application.find({ studentId: userId }).populate('jobId');
+      console.log("Applications:", applications); // Log the applications data
+  
+      res.json({
+        studentData,
+        applications,
+      });
+    } catch (error) {
+      console.error('Error fetching student dashboard data:', error);
+      res.status(500).json({ message: 'Server error while fetching student data', error: error.message });
+    }
+  };
+  
 
 
  
@@ -296,5 +298,6 @@ module.exports = {
     deleteStudent,
     loginStudent,
     getDashboardData,
-    getStudentData
+    getStudentData,
+    getStudentDashboard
 };

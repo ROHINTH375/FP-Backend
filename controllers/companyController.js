@@ -88,7 +88,7 @@ exports.getAllCompanies = async (req, res) => {
     // Post a new job
     exports.postJob = async (req, res) => {
       try {
-        const { companyId, jobTitle, jobDescription, requirements } = req.body; // Destructure required fields
+        const { jobTitle, jobDescription, requirements } = req.body; // Destructure required fields
     
         // Validate the request body
         if (!jobTitle || !jobDescription || !requirements) {
@@ -164,3 +164,24 @@ exports.updateApplicationStatus = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+exports.getCompanyDashboard = async (req, res) => {
+  try {
+    const companyId = req.user.companyId; // Assume `req.user` contains the company ID from the token
+    // Fetch company dashboard data (e.g., metrics, stats, etc.)
+    const dashboardData = {
+      totalEmployees: 120,
+      activeProjects: 15,
+      revenue: 500000,
+    };
+
+    res.status(200).json(dashboardData);
+  } catch (error) {
+    console.error('Error fetching company dashboard:', error);
+    res.status(500).json({ message: 'Error fetching dashboard data' });
+  }
+};
+
+// module.exports = { getCompanyDashboard };
+
+

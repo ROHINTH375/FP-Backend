@@ -3,33 +3,12 @@ const { createJob, getJobDetails, updateJobStatus } = require('../controllers/jo
 const router = express.Router();
 const Job = require('../models/Job'); // Assuming you have a Job model
 const Application = require('../models/Application');
-
-// POST /api/jobs/create - Create a new job posting
-router.post('/create', async (req, res) => {
-    console.log("Request Body:", req.body);
-    try {
-        const { companyId, jobTitle, jobDescription, requirements } = req.body;
-
-        // Validate required fields
-        if (!companyId || !jobTitle || !jobDescription || !requirements) {
-            return res.status(400).json({ message: "All fields are required." });
-        }
-
-        // Create a new job
-        const job = new Job({
-            companyId,
-            jobTitle,
-            jobDescription,
-            requirements,
-        });
-        await job.save();
-
-        res.status(201).json({ message: "Job posted successfully!", job });
-    } catch (error) {
-        console.error("Error posting job:", error);
-        res.status(500).json({ message: "Error posting job", error: error.message });
-    }
-});
+const multer = require("multer");
+const { postJob } = require('../controllers/jobController');
+const authMiddleware = require('../middlewares/authMiddleware');
+router.post('/job/post', postJob);
+const Student = require('../models/Student');
+const upload = multer({ dest: 'uploads/' });
 // GET /api/jobs/applications/:jobId - Get applications for a specific job
 router.get('/applications/:jobId', async (req, res) => {
     try {
@@ -56,6 +35,136 @@ router.put('/applications/:applicationId', async (req, res) => {
     });
 router.put('/api/jobs/:jobId/status', updateJobStatus);
 
+// router.post('/api/applications/apply', async (req, res) => {
+//   try {
+//     const { studentId, jobId, coverLetter, resume } = req.body;
 
+//     // Check if job exists
+//     const job = await Job.findById(jobId);
+//     if (!job) {
+//       return res.status(404).json({ error: 'Job not found' });
+//     }
+
+//     // Check if student exists
+//     const student = await Student.findById(studentId);
+//     if (!student) {
+//       return res.status(404).json({ error: 'Student not found' });
+//     }
+
+//     // Create application
+//     const application = new Application({
+//       studentId,
+//       jobId,
+//       coverLetter,
+//       resume,
+//       status: 'pending',
+//     });
+
+//     await application.save();
+
+//     res.status(201).json({ message: 'Application submitted successfully', application });
+//   } catch (error) {
+//     console.error('Error applying for job:', error.message);
+//     res.status(500).json({ error: 'Error applying for job' });
+//   }
+// });
+
+// router.post('/api/applications/apply', async (req, res) => {
+//   try {
+//     const { studentId, jobId, coverLetter, resume } = req.body;
+
+//     // Check if job exists
+//     const job = await Job.findById(jobId);
+//     if (!job) {
+//       return res.status(404).json({ error: 'Job not found' });
+//     }
+
+//     // Check if student exists
+//     const student = await Student.findById(studentId);
+//     if (!student) {
+//       return res.status(404).json({ error: 'Student not found' });
+//     }
+
+//     // Create application
+//     const application = new Application({
+//       studentId,
+//       jobId,
+//       coverLetter,
+//       resume,
+//       status: 'pending',
+//     });
+
+//     await application.save();
+
+//     res.status(201).json({ message: 'Application submitted successfully', application });
+//   } catch (error) {
+//     console.error('Error applying for job:', error.message);
+//     res.status(500).json({ error: 'Error applying for job' });
+//   }
+// });
+
+
+// router.post('/api/applications/apply', async (req, res) => {
+//   try {
+//     const { studentId, jobId, coverLetter, resume } = req.body;
+
+//     // Check if the job exists
+//     const job = await Job.findById(jobId);
+//     if (!job) {
+//       return res.status(404).json({ error: 'Job not found' });
+//     }
+
+//     // Check if the student exists
+//     const student = await Student.findById(studentId);
+//     if (!student) {
+//       return res.status(404).json({ error: 'Student not found' });
+//     }
+
+//     // Create a new application
+//     const application = new Application({
+//       studentId,
+//       jobId,
+//       companyId: job.companyId, // Assuming the job contains a reference to the company
+//       coverLetter,
+//       resume,
+//       status: 'pending',
+//     });
+
+//     await application.save();
+//     res.status(201).json({ message: 'Application submitted successfully', application });
+//   } catch (error) {
+//     console.error('Error applying for the job:', error.message);
+//     res.status(500).json({ error: 'Error applying for the job', details: error.message });
+//   }
+// });
+
+
+router.post('/api/applications/apply', authMiddleware, upload.single('resume'), async (req, res) => {
+  try {
+    const { jobId, studentId, coverLetter } = req.body;
+    const resume = req.file ? req.file.path : null; // Store file path for resume if uploaded
+    console.log("Uploaded file:", req.file);
+    // Find the job to verify if it exists
+    const job = await Job.findById(jobId);
+    if (!job) {
+      return res.status(404).json({ error: "Job not found" });
+    }
+
+    // Create a new application
+    const newApplication = new Application({
+      jobId,
+      studentId,
+      coverLetter,
+      resume,
+    });
+
+    await newApplication.save();
+
+    res.status(200).json({ success: true, message: "Application submitted successfully" });
+  } catch (error) {
+    console.error("Error applying for job:", error);
+    res.status(500).json({ error: "Server error while applying for job" });
+  }
+});
 
 module.exports = router;

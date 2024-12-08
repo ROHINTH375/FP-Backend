@@ -28,24 +28,33 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
 
 const app = express();
 
+const corsOptions = {
+  origin: 'https://stirring-khapse-d65fe5.netlify.app', // Allow requests from your frontend URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true, // Allow credentials if needed
+};
+
+app.use(cors(corsOptions));
+
 // Middleware
 app.use(express.json());
 app.use(cors());
 app.use(bodyParser.json());
 app.use('/api/academic', academicRoutes);
 app.use('/api/analytics', analyticsRoutes);
-app.use('/api/user', userRoutes);
+app.use('/user', userRoutes);
 app.use('/api', placementRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api', recruitmentRoutes);
-app.use(studentRoutes);
+app.use('/api', studentRoutes);
 app.use('/api/company', companyRoutes);
+app.use('/company', companyRoutes);
 // app.use('/api/students', require('./routes/studentRoutes'));
 app.use('/api', studentRoutes);
 app.use('/api/applications', applicationRoutes);
-app.use('/api', adminRoutes);
+app.use('/api/admin', adminRoutes);
 app.use('/api/interviews', interviewRoutes);
-app.use('/api/jobs', jobRoutes);
+app.use('/api', jobRoutes);
 app.post('/api/auth/register-student', async (req, res) => {
   try {
     // Your registration logic here (e.g., checking if student exists, hashing password, etc.)
@@ -60,6 +69,12 @@ app.post('/api/auth/register-student', async (req, res) => {
     });
   }
 });
+
+app.post('/user/profile', (req, res) => {
+  // Logic to handle the request
+  res.json({ message: 'Profile updated successfully' });
+});
+
 
 app.post('/api/applications', async (req, res) => {
   try {
@@ -179,7 +194,9 @@ app.get('/api/test', (req, res) => {
 res.status(200).json({ message: "Frontend and Backend are connected!" });
 });
 
-
+app.get('/test', (req, res) => {
+  res.status(200).send('Test route working');
+});
 
 // Start server
 const PORT = process.env.PORT || 5000;

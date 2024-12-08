@@ -1,77 +1,105 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const { getStudentProfile, updateStudentProfile, getStudentDashboard } = require('../controllers/studentController');
 const studentController = require('../controllers/studentController');
 const router = express.Router();
-// const authMiddleware = require('../middleware/authMiddleware');
 const { registerStudent, loginStudent,getDashboardData, getStudentData } = require('../controllers/studentController');
 const Student = require('../models/Student');
 const authMiddleware = require('../middlewares/authMiddleware');
+// const authenticateToken = require('../middlewares/authenticateToken')
 
-// const auth = require('../middleware/authMiddleware');
-// Student profile routes
-// router.get('/profile', authMiddleware, getStudentProfile);
-// router.put('/profile', authMiddleware, updateStudentProfile);
-// In routes/studentRoutes.js
-// router.post('/register', studentController.registerStudent);
+router.get('/students', async (req, res) => {
+  try {
+    const students = await Student.find();
+    res.json(students);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch students.' });
+  }
+});
 
-// // Register a new student
-// router.post('/register-student', studentController.registerStudent);
+// router.get('/dashboard-student',authenticateToken,  async (req, res) => {
+//   try {
+//     const studentId = req.user.id; // Extract student ID from token
+//     const student = await Student.findById(studentId);
 
-// // Get all students
-// router.get('/students', studentController.getAllStudents);
-
-// // Get a single student by ID
-// router.get('/students/:id', studentController.getStudentById);
-
-// // Update student details by ID
-// router.put('/students/:id', studentController.updateStudent);
-
-// // Delete a student by ID
-// router.delete('/students/:id', studentController.deleteStudent);
-
-// Register Student
-// router.post('/register', async (req, res) => {
-//     try {
-//         const { name, email, password } = req.body;
-//         const hashedPassword = await bcrypt.hash(password, 10);
-
-//         const newStudent = new Student({
-//             name,
-//             email,
-//             password: hashedPassword
-//         });
-
-//         await newStudent.save();
-//         res.status(201).json({ message: 'Student registered successfully' });
-//     } catch (error) {
-//         res.status(500).json({ message: 'Student registration failed' });
+//     if (!student) {
+//       return res.status(404).json({ message: 'Student not found' });
 //     }
+
+//     res.json(student);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: 'Server error' });
+//   }
 // });
+// router.get('/student/dashboard-student', authMiddleware, async (req, res) => {
+//   try {
+//       const userId = req.user.id; // Authenticated user ID from middleware
+
+//       // Validate userId
+//       if (!mongoose.Types.ObjectId.isValid(userId)) {
+//           return res.status(400).json({ success: false, message: 'Invalid user ID format' });
+//       }
+
+//       // Fetch the student data
+//       const studentData = await Student.findById(userId);
+
+//       if (!studentData) {
+//           return res.status(404).json({ success: false, message: 'Student not found' });
+//       }
+
+//       // Optionally fetch related data
+//       const applications = await Application.find({ studentId: userId });
+//       const jobs = await Job.find();
+
+//       // Respond with data
+//       res.status(200).json({
+//           success: true,
+//           data: {
+//               student: studentData,
+//               applications,
+//               jobs,
+//           },
+//       });
+//   } catch (error) {
+//       console.error("Error fetching student data:", error.message);
+//       res.status(500).json({ success: false, message: 'Server error while fetching student data' });
+//   }
+// });
+
+router.get('/dashboard-student', authMiddleware, getStudentDashboard);
 router.post('/register-student', registerStudent);
-router.get('/dashboard-student', getStudentData);
+// router.get('/dashboard-student', getStudentData);
+
 router.get('/dashboard', getStudentData);
-router.get('/dashboard-student', authMiddleware);
+// router.get('/dashboard-student', authMiddleware);
+router.get('/student/dashboard-student', authMiddleware, async (req, res) => {
+  console.log("Request received at /student/dashboard-student");
+  try {
+      const userId = req.user.id; // Extract user ID from the middleware
+
+      // Validate userId format
+      if (!mongoose.Types.ObjectId.isValid(userId)) {
+          return res.status(400).json({ success: false, message: 'Invalid user ID format' });
+      }
+
+      // Fetch the student data from the database
+      const studentData = await Student.findById(userId);
+
+      if (!studentData) {
+          return res.status(404).json({ success: false, message: 'Student not found' });
+      }
+
+      // Respond with the student data
+      res.status(200).json({ success: true, data: studentData });
+  } catch (error) {
+      console.error("Error fetching student data:", error.message);
+      res.status(500).json({ success: false, message: 'Server error while fetching student data' });
+  }
+});
 router.post('/login-student', loginStudent);
-// router.post('/students', studentController.createStudent);
-// Student Login
-// router.post('/login', async (req, res) => {
-//     try {
-//         const { email, password } = req.body;
-//         const student = await Student.findOne({ email });
-
-//         if (!student || !(await bcrypt.compare(password, student.password))) {
-//             return res.status(401).json({ message: 'Invalid credentials' });
-//         }
-
-//         const token = jwt.sign({ id: student._id }, 'your_jwt_secret');
-//         res.json({ message: 'Login successful', token });
-//     } catch (error) {
-//         res.status(500).json({ message: 'Login failed' });
-//     }
-// });
 router.get('/api/your-protected-route', authMiddleware, (req, res) => {
   res.send("This is a protected route!");
 });
-// router.post('/login', loginStudent);
 router.get('/dashboard',getDashboardData);
 module.exports = router;
